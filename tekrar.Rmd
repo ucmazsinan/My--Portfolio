@@ -1,0 +1,487 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+# WEEK << 1 >> DATA MİNİNG
+```{r}
+library(readr)
+forestfires <- read_csv("C:/Users/user/Desktop/Veri Madenciliği/week1-2/forestfires.csv")
+data <- forestfires
+```
+
+
+```{r}
+data
+```
+
+# Factor Yapma
+
+
+```{r}
+data$month <- factor(data$month)
+data$day <- factor(data$day)
+```
+
+
+# İsim Değiştirme
+
+
+```{r}
+names(data)[names(data) == 'X'] = 'X_Coordinate'
+names(data)[2] = 'Y_Coordinate'
+names(data)
+```
+
+# Değişkenler Tipleri Gösterme
+
+```{r}
+str(data)
+```
+
+# Factor olarak tanımlanan değişkenler
+## Seviyelerini yazdırma
+
+```{r}
+levels(data$month)
+```
+
+# Seviyeleri Türkçeleştirme
+
+```{r}
+Month_Levels <- c('Nisan','Agustos','Aralik','Subat','Ocak','Temmuz','Haziran','Mart','Mayis','Kasim','Ekim','Eylül','Eylül')
+Month_Levels
+```
+
+# Yeniden atama
+
+```{r}
+levels(data$month) <- Month_Levels
+data
+```
+# Sıralı bir seviye oluşturma
+ 
+```{r}
+order_level_month = c('Ocak','Subat','Mart','Nisan','Mayıs','Haziran','Temmuz','Agustos','Eylül','Ekim','Kasım','Aralık')
+```
+
+# Sıralı seviyeyi atama
+
+```{r}
+data$month <- relevel(data$month, 'Aralik')
+data$month <- relevel(data$month, 'Kasim')
+data$month <- relevel(data$month, 'Kasim')
+data$month <- relevel(data$month, 'Ekim')
+data$month <- relevel(data$month, 'Eylül')
+data$month <- relevel(data$month, 'Agustos')
+data$month <- relevel(data$month, 'Temmuz')
+data$month <- relevel(data$month, 'Haziran')
+data$month <- relevel(data$month, 'Mayis')
+data$month <- relevel(data$month, 'Nisan')
+data$month <- relevel(data$month, 'Mart')
+data$month <- relevel(data$month, 'Subat')
+data$month <- relevel(data$month, 'Ocak')
+```
+
+```{r}
+levels(data$month)
+```
+
+
+
+######data$month <- factor(data$month, levels = order_level_month)
+
+```{r}
+data
+```
+
+# Seviyeleri bastırma Aylık 
+
+```{r}
+levels(data$month)
+```
+
+# İstenilen sırada gösterme Grafik
+
+```{r}
+plot(data$month)
+```
+
+# Aynı işlemler Gün için yapılıyor
+
+```{r}
+levels(data$day)
+```
+
+```{r}
+Day_Levels  <-  c('Cuma', 'Pazartesi', 'Cumartesi', 'Pazar', 'Persembe', 'Sali', 'Sali', 'Carsamba')
+Day_Levels
+```
+
+
+```{r}
+levels(data$day) <- Day_Levels
+head(data)
+```
+
+
+```{r}
+order_level_day = c('Pazartesi','Sali','Carsamba','Persembe','Cuma','Cumartesi','Pazar')
+```
+
+```{r}
+data$day <- relevel(data$day, ref = 'Pazar')
+data$day <- relevel(data$day, ref = 'Cumartesi')
+data$day <- relevel(data$day, ref = 'Cuma')
+data$day <- relevel(data$day, ref = 'Persembe')
+data$day <- relevel(data$day, ref = 'Carsamba')
+data$day <- relevel(data$day, ref = 'Sali')
+data$day <- relevel(data$day, ref = 'Pazartesi')
+```
+
+
+############data$day <- factor(data$day, levels = order_level_day)
+#################head(data)
+
+```{r}
+plot(data$day)
+```
+
+
+# Özet istatistikler
+
+```{r}
+summary(data)
+```
+
+# Tablo olarak günleri ve Ayları gösterme frekansları
+
+
+```{r}
+table(data$day, data$month)
+```
+
+
+# Değişken Silme 
+
+```{r}
+data['FFMC'] <- NULL
+colnames(data) # FFMC sildiğimiz için gelmetecektire
+
+```
+
+
+# Basit Grafik Çizimler,
+```{r}
+hist(data$wind)
+```
+
+# Saçılım Grafiği çizme
+
+```{r}
+plot(data$wind, data$temp)
+```
+
+# bar plot
+
+```{r}
+plot(data$month)
+```
+
+
+# Eksik Gözlem Sorgulama
+```{r}
+anyNA(data)
+```
+
+# Kaçtane Eksik Gözlem bulunmaktadır
+```{r}
+summary(complete.cases(data))
+```
+
+
+# Eksik Gözlem doldurmak istemezsen
+# onları yoksaymak için
+
+```{r}
+na.omit(data) #81 gözlem silinmiş olur
+```
+
+# ortalama ile gözlemleri doldurma
+# DMC eksik gözlem vardı
+```{r}
+data$DMC[is.na(data$DMC)] <- mean(data$DMC, na.rm = T)
+```
+
+```{r}
+data[!complete.cases(data),]
+```
+
+# RH ortalama ile doldurma
+
+```{r}
+data$RH[is.na(data$RH)] <- mean(data$RH, na.rm = T)
+```
+
+# Tekrardan eksik gözlem sorgulama
+```{r}
+data[!complete.cases(data),]
+```
+# Eksik Gözlemleri Yoksay
+
+```{r}
+data<- na.omit(data)
+```
+
+# Özet istatistikleri 
+
+```{r}
+summary(data)
+```
+# Sıfırdan küçük olan sıcakları Sıfırla Değiştirme
+```{r}
+data$temp <- replace(data$temp, data$temp < 0, 0)
+```
+
+# Kutu grafiği numeric değişkenler için
+
+```{r}
+boxplot(data$temp)
+```
+
+
+# Kategoriğe ayırarak Box plot çizdirme
+
+```{r}
+boxplot(temp~day,
+        data = data,
+        main = 'Günlere Göre Sıcak',
+        xlab = 'Günler',
+        ylab = 'Sıcaklık',
+        col = 'orange',
+        border = 'brown')
+```
+
+# Aylara Göre Sıcaklık
+
+```{r}
+boxplot(temp~month,
+        data = data,
+        main = 'Günlere Göre Sıcak',
+        xlab = 'Günler',
+        ylab = 'Sıcaklık',
+        col = 'orange',
+        border = 'brown')
+```
+
+```{r}
+hist(data$RH)
+```
+# Sürekli veri kategorik yapma
+```{r}
+min(data$temp)
+```
+```{r}
+max(data$temp)
+```
+#Yeni bir Kategoric değişken atama
+```{r}
+data$categoric_temp <- cut(data$temp, breaks = c(2.2, 15, 30, 50, Inf),
+    labels = c('Düsük', 'Orta', 'Sicak', 'Cehennem'))
+```
+
+```{r}
+plot(data$categoric_temp,col = 'pink')
+```
+
+# WEEK << 2 >> DATA MİNİNG
+
+```{r}
+library(ggplot2)
+library(gridExtra) # satır ve surunlarda 1 den fazla grafik gösterme için 
+```
+
+# Veri Kopyalama
+```{r}
+data2 <- data
+```
+
+grafik1=ggplot(veri_t, aes(x=Sicaklik)) + geom_density(fill="slateblue")
+grafik2=ggplot(veri_t, aes(x=DMC, y=RH, color=gun)) + geom_point(size=3) + theme(legend.position="bottom")
+grafik3=ggplot(veri_t, aes(x=factor(kat_DMC), y=Ruzgar_hizi, fill=gun)) + geom_boxplot() + theme(legend.position="bottom")
+grafik4=ggplot(veri_t , aes(x=factor(gun), fill=factor(kat_DMC))) + geom_bar()
+
+```{r}
+graph1 <- ggplot(data2, aes(x = temp)) + geom_density(fill = 'slateblue')
+graph1
+```
+
+```{r}
+graph2 <- ggplot(data2, aes(x = temp, y = DC, color = month)) + geom_point() + theme(legend.position = 'upper')
+graph2
+```
+
+```{r}
+graph3 <- ggplot(data2, aes(x = day, y = temp, fill = day)) + geom_boxplot() +
+  theme(legend.position = 'upper')
+graph3
+```
+
+
+```{r}
+graph4 <- ggplot(data2, aes(x = day, fill = categoric_temp)) + geom_bar()
+graph4
+```
+
+# Çerçeve ayarlama aynı alanda tüm grafiği gösterme
+
+```{r}
+grid.arrange(graph2, arrangeGrob(graph3, graph4, ncol = 2), nrow = 2)
+```
+
+
+```{r}
+grid.arrange(graph1, graph2, graph3, nrow = 3)
+```
+
+
+```{r}
+grid.arrange(graph1, graph2, graph3, ncol = 3)
+```
+
+
+```{r}
+grid.arrange(graph2, arrangeGrob(graph3, graph4, nrow = 2), ncol = 2)
+```
+
+# Tek Değişkenlere Ait Grafik Çizme
+
+```{r}
+ggplot(data2, aes(temp)) + geom_histogram(fill = 'slateblue',bins = 30)
+```
+
+
+```{r}
+ggplot(data2, aes(temp)) + geom_density(fill = 'slateblue')
+```
+
+
+```{r}
+ggplot(data2, aes(categoric_temp)) + geom_bar(fill = 'pink')
+```
+
+
+```{r}
+ggplot(data2, aes(day)) + geom_bar(fill = 'orange')
+```
+
+
+```{r}
+ggplot(data2, aes(month)) + geom_bar(fill = 'red')
+```
+
+# Yığın halinde yoğunluk sıcaklığaait
+
+```{r}
+ggplot(data2, aes(x = temp, fill = day)) + geom_density(position = 'stack')
+```
+
+
+# Box plot with temp
+
+```{r}
+ggplot(data2, aes(temp)) + geom_boxplot(col = 'black', fill = 'orange')
+```
+
+```{r}
+New_Data <- data2[which(data2$temp < 35 &data2$temp > 7 ),] 
+```
+
+```{r}
+ggplot(New_Data, aes(x = temp)) + geom_boxplot(col = 'black', fill = 'pink')
+```
+
+
+# Pie Chart 
+bilgi bakımından eksik bir grafik 
+
+```{r}
+ggplot(New_Data, aes(x = factor(1), fill = day)) + geom_bar(width = 7) + coord_polar("y")
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+df <- New_Data %>%
+  group_by(categoric_temp) %>%
+  count() %>%
+  ungroup() %>%
+  mutate(perc = n / sum(n)) %>% 
+  arrange(perc) %>%
+  mutate(labels = scales::percent(perc))
+```
+
+```{r}
+ggplot(df, aes(x = "", y = perc, fill = categoric_temp)) +
+  geom_col() +
+  geom_text(aes(label = labels),
+             position = position_stack(vjus = 0.5)) + 
+  coord_polar(theta = "y")
+```
+# HeatMap 
+```{r}
+str(New_Data)
+```
+
+```{r}
+Numerical_Data <- New_Data[,c('DMC', 'DC','temp', 'wind','rain','area')]
+```
+
+```{r}
+Numerical_Data
+```
+
+```{r}
+Numerical_Matrix <- as.matrix(Numerical_Data)
+heatmap(Numerical_Matrix)
+```
+
+
+```{r}
+heatmap(Numerical_Matrix, scale = "column")
+```
+
+
+```{r}
+heatmap(Numerical_Matrix, Colv = NA, Rowv = NA, scale = 'column')
+```
+```{r}
+New_Data$RH <- NULL
+```
+
+```{r}
+library(GGally)
+
+ggparcoord(data = New_Data,
+           columns = 6:9,
+           groupColumn = "categoric_temp")
+```
+
+
+```{r}
+ggparcoord(data = New_Data,
+           columns = 6:7,
+           groupColumn = "categoric_temp")
+```
+
+
+
+
+
+
+
+
